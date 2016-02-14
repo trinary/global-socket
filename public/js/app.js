@@ -31,13 +31,12 @@ var width = window.innerWidth,
 
 var markers = [];
 
+var duration = 90000;
+var automove = 3000;
+
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-
-var duration = 90000;
-
 var origin = new THREE.Vector3(0, 0, 0);
-
 var renderer = new THREE.WebGLRenderer();
 renderer.setSize(width, height);
 var geometry = new THREE.SphereGeometry(10, 64, 64);
@@ -53,18 +52,36 @@ scene.add(light);
 scene.add(light2);
 
 var globe = new THREE.Mesh(geometry, material);
+var lastmoved = new Date();
+var lastframe = new Date();
 scene.add(globe);
 
 camera.position.z = 20;
 
+var cameraMove = function(camera, delta) {
+  var orbitPeriod = 60000;
+  var step = delta / orbitPeriod;
+  var diff = {
+    x: Math.cos(step) * 20,
+    y: Math.sin(step) * 12,
+    z: Math.sin(step) * 20
+  };
+  var timeDiff = Date.now() - lastmoved;
+  var current = camera.position;
+  var newpos = [
+    current.x + diff.x,
+    current.y + diff.y,
+    current.z + diff.z,
+  ];
+  camera.position.fromArray(newpos);
+  camera.lookat(origin);
+  console.log(timeDiff, current, newpos);
+};
 
 var render = function () {
-//  requestAnimationFrame(render);
-  var timer = Date.now() * 0.0001;
-
-
+  var now = new Date();
   markers.forEach(function (m) {
-    var age = new Date() - m.start;
+    var age = now - m.start;
     var ratio = (duration - age) / duration;
     m.mesh.material.opacity = ratio;
     if (m.mesh.material.opacity < 0) {
@@ -75,7 +92,14 @@ var render = function () {
 
   markers = markers.filter(function (m) { return m !== undefined; });
 
+  console.log(now);
+  if (now - lastmoved > automove) {
+    cameraMove(camera, Date.now() - lastframe);
+  }
+
   renderer.render(scene, camera);
+  lastframe = new Date();
+  requestAnimationFrame(render);
 };
 
 function addTweet(tweet) {
@@ -102,15 +126,19 @@ function addTweet(tweet) {
     marker.lookAt(origin);
     markers.push({mesh: marker, start: new Date()});
     scene.add(marker);
-    render();
   }
+}
+
+function controlledMove() {
+  lastmoved = new Date();
+  render();
 }
 
 render();
 
 var controls = new THREE.OrbitControls(camera);
 controls.damping = 0.2;
-controls.addEventListener('change', render);
+controls.addEventListener('change', controlledMove);
 
 document.body.appendChild(renderer.domElement);
 

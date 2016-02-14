@@ -10,11 +10,13 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
+var logger = io.log;
 var device  = require('express-device');
 var ps = require('powersocket');
 
-var runningPortNumber = process.env.PORT;
+var runningPortNumber = process.env.PORT || 7008;
 
+io.set('log level', 2);
 
 app.configure(function () {
 	// I need to access everything in '/public' directly
@@ -48,7 +50,7 @@ ps.configuration({
 });
 
 ps.callback(function(d) { 
-  console.log(d);
+  console.log(d.id);
   io.sockets.emit('tweet', d)
 });
 

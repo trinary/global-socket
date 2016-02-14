@@ -15,14 +15,6 @@ module.exports = function (grunt) {
  
   grunt.initConfig({
 
-    cssmin: {
-      combine: {
-        files: {
-          'public/css/core.css': 'public/bower_components/bootstrap.css/css/bootstrap.css'
-        }
-      }
-    },
-
     less: {
       options: {
         //report:'gzip'
@@ -55,44 +47,6 @@ module.exports = function (grunt) {
         },
         files: {
           'public/css/core.css': 'public/bower_components/bootstrap-stylus/stylus/bootstrap.styl'
-        }
-      }
-    },
-
-    concat: {
-      options: {
-        separator: ';',
-        stripBanners:true
-      },
-      dist: {
-        src: ['public/js/app.js'],
-        dest: 'public/js/concat.js',
-      },
-    },
-
-    //this is currently turned off, since jquery KILLS it 
-    jshint: {
-      options: {
-        curly: true,
-        eqeqeq: false,
-        eqnull: true,
-        browser: true,
-        globals: {
-          jQuery: true
-        }
-      },
-      files:{
-        src:['public/js/concat.js']
-      } 
-    },
-
-    uglify: {
-      options: {
-        mangle: false
-      },
-      my_target: {
-        files: {
-          'public/js/app.min.js': ['public/js/concat.js']
         }
       }
     },
@@ -201,7 +155,7 @@ module.exports = function (grunt) {
  
   //grunt.registerTask('server', ['build', 'connect:livereload', 'open', 'watch']);
  
-  grunt.registerTask('build', ['cssmin', 'concat', 'uglify']);
+  grunt.registerTask('build', []);
 
   grunt.registerTask('launch', ['wait', 'open']);
 
