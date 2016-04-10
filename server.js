@@ -50,7 +50,7 @@ ps.configuration({
 });
 
 ps.callback(function(d) { 
-  console.log(d.id);
+  console.log(new Date(), d.id, d.geo || d.location.geo);
   io.sockets.emit('tweet', d)
 });
 
